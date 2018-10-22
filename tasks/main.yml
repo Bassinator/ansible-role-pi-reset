@@ -1,0 +1,65 @@
+---
+- name: install os packages
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ packages }}"
+  become: true
+
+- name: download noobs
+  unarchive:
+    src: https://downloads.raspberrypi.org/NOOBS_lite_latest
+    dest: "/vagrant/download"
+#     dest: "/mnt/NOOBS"
+    remote_src: true
+
+- file:
+#     path: "/mnt/NOOBS/os/raspbian_lite/"
+    path: "/vagrant/download/os/raspbian_lite/"
+    state: directory
+    mode: 0755
+- name: download os
+  unarchive:
+    src: https://downloads.raspberrypi.org/raspbian_lite_latest
+    dest: "/vagrant/download/os/raspbian_lite/"
+    remote_src: true
+
+#  get_url:
+#    url: "{{ item }}"
+#    dest: "/vagrant/download/os/raspbian_lite"
+#     dest: "/mnt/NOOBS/os/raspbian_lite"
+#  with_items:
+#    - http://downloads.raspberrypi.org/raspbian_lite/Raspbian_Lite.png
+#    - http://downloads.raspberrypi.org/raspbian_lite/os.json
+#    - http://downloads.raspberrypi.org/raspbian_lite/partition_setup.sh
+#    - http://download.osmc.tv/installers/noobs/partitions-pi1.json
+#    - http://download.osmc.tv/installers/noobs/boot-rbp1.tar.xz
+#    - http://download.osmc.tv/installers/noobs/root-rbp1.tar.xz
+#- name: download marketing slides
+#  unarchive:
+#    src: "http://downloads.raspberrypi.org/raspbian_lite/marketing.tar"
+#    # dest: "/mnt/NOOBS/os/raspbian_lite/"
+#    dest: "/vagrant/download/os/raspbian_lite/"
+#    remote_src: true
+
+#
+# - name: configure recovery.cmd to autostart installation
+#   copy:
+#     src: recovery.cmdline
+#     dest: "/mnt/NOOBS"
+#
+# - name: enable ssh on boot
+#   file:
+#     path: "{{ download_dir }}/SSH"
+#     state: touch
+#
+# - name: unmount sd card
+#   mount:
+#    path: /mnt/NOOBS
+#    state: unmounted
+
+#- name: copy wifi configuration
+#  copy:
+#    src: ./wpa_supplicant.conf
+#    dest: /mnt/NOOBS/
+#    mode: 0600

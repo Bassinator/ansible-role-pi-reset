@@ -18,13 +18,14 @@
   get_url:
     url: https://downloads.raspberrypi.org/NOOBS_lite_latest
     dest: '{{ download_dir }}/noobs_lite.zip'
-    remote_src: true
+  register: dl
 
 - name: extract noobs
   unarchive:
     src: '{{ download_dir }}/noobs_lite.zip'
     dest: '{{ download_dir }}/noobs/'
     remote_src: true
+  when: dl.changed
 
 - file:
     path: '{{ download_dir }}/noobs/os/raspbian_lite/'
@@ -35,14 +36,14 @@
   get_url:
     url: 'https://downloads.raspberrypi.org/raspbian_lite_latest'
     dest: '{{ download_dir }}/raspbian_lite.zip'
-
-
+  register: dl
 
 - name: extract os
   unarchive:
     src: '{{ download_dir }}/raspbian_lite.zip'
     dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
     remote_src: true
+  when: dl.changed
 
 #  get_url:
 #    url: "{{ item }}"

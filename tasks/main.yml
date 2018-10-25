@@ -8,7 +8,7 @@
 
 - name: create download directory
   file:
-    path: "{{ download_dir }}"
+    path: "{{ download_dir }}/noobs"
     state: directory
     owner: '{{ installation_os_user }}'
     group: '{{ installation_os_group }}'

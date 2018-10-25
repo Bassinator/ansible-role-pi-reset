@@ -15,21 +15,33 @@
     mode: 0755
 
 - name: download noobs
+  get_url:
+    url: https://downloads.raspberrypi.org/NOOBS_lite_latest
+    dest: "{{ download_dir }}"/noobs_lite.zip
+    remote_src: true
+
+- name: extract noobs
   unarchive:
-    src: https://downloads.raspberrypi.org/NOOBS_lite_latest
-    dest: "{{ download_dir }}"
-#     dest: "/mnt/NOOBS"
+    src: '{{ download_dir }}/noobs_lite.zip'
+    dest: '{{ download_dir }}/noobs/'
     remote_src: true
 
 - file:
-#     path: "/mnt/NOOBS/os/raspbian_lite/"
-    path: "{{ download_dir }}/os/raspbian_lite/"
+    path: '{{ download_dir }}/noobs/os/raspbian_lite/'
     state: directory
     mode: 0755
+
 - name: download os
+  get_url:
+    url: 'https://downloads.raspberrypi.org/raspbian_lite_latest'
+    dest: '{{ download_dir }}/raspbian_lite.zip'
+
+
+
+- name: extract os
   unarchive:
-    src: https://downloads.raspberrypi.org/raspbian_lite_latest
-    dest: "{{ download_dir }}/os/raspbian_lite/"
+    src: '{{ download_dir }}/raspbian_lite.zip'
+    dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
     remote_src: true
 
 #  get_url:

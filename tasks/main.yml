@@ -10,7 +10,7 @@
   file:
     path: "{{ download_dir }}"
     state: directory
-    user: '{{ installation_os_user }}'
+    owner: '{{ installation_os_user }}'
     group: '{{ installation_os_group }}'
     mode: 0755
 

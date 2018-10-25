@@ -6,22 +6,30 @@
   with_items: "{{ packages }}"
   become: true
 
+- name: create download directory
+  file:
+    path: "{{ download_dir }}"
+    state: directory
+    user: '{{ installation_os_user }}'
+    group: '{{ installation_os_group }}'
+    mode: 0755
+
 - name: download noobs
   unarchive:
     src: https://downloads.raspberrypi.org/NOOBS_lite_latest
-    dest: "/vagrant/download"
+    dest: "{{ download_dir }}"
 #     dest: "/mnt/NOOBS"
     remote_src: true
 
 - file:
 #     path: "/mnt/NOOBS/os/raspbian_lite/"
-    path: "/vagrant/download/os/raspbian_lite/"
+    path: "{{ download_dir }}/os/raspbian_lite/"
     state: directory
     mode: 0755
 - name: download os
   unarchive:
     src: https://downloads.raspberrypi.org/raspbian_lite_latest
-    dest: "/vagrant/download/os/raspbian_lite/"
+    dest: "{{ download_dir }}/os/raspbian_lite/"
     remote_src: true
 
 #  get_url:

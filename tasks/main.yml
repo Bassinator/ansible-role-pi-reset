@@ -18,14 +18,14 @@
   get_url:
     url: https://downloads.raspberrypi.org/NOOBS_lite_latest
     dest: '{{ download_dir }}/noobs_lite.zip'
-  register: dl
+  register: dl_noobs
 
 - name: extract noobs
   unarchive:
     src: '{{ download_dir }}/noobs_lite.zip'
     dest: '{{ download_dir }}/noobs/'
     remote_src: true
-  when: dl.changed
+  when: dl_noobs.changed
 
 - file:
     path: '{{ download_dir }}/noobs/os/raspbian_lite/'
@@ -36,26 +36,30 @@
   get_url:
     url: 'https://downloads.raspberrypi.org/raspbian_lite_latest'
     dest: '{{ download_dir }}/raspbian_lite.zip'
-  register: dl
+  register: dl_raspbian
 
 - name: extract os
   unarchive:
     src: '{{ download_dir }}/raspbian_lite.zip'
     dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
     remote_src: true
-  when: dl.changed
+  when: dl_raspbian.changed
 
-#  get_url:
-#    url: "{{ item }}"
-#    dest: "/vagrant/download/os/raspbian_lite"
-#     dest: "/mnt/NOOBS/os/raspbian_lite"
-#  with_items:
-#    - http://downloads.raspberrypi.org/raspbian_lite/Raspbian_Lite.png
-#    - http://downloads.raspberrypi.org/raspbian_lite/os.json
-#    - http://downloads.raspberrypi.org/raspbian_lite/partition_setup.sh
+- get_url:
+    url: "{{ item }}"
+    dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
+  with_items:
+    - http://downloads.raspberrypi.org/raspbian_lite/Raspbian_Lite.png
+    - http://downloads.raspberrypi.org/raspbian_lite/os.json
+    - http://downloads.raspberrypi.org/raspbian_lite/partition_setup.sh
+    - http://downloads.raspberrypi.org/raspbian_lite/partitions.json
+#    - http://downloads.raspberrypi.org/raspbian_lite/piserver.tar.xz
+    - http://downloads.raspberrypi.org/raspbian_lite/root.tar.xz
+    - http://downloads.raspberrypi.org/raspbian_lite/boot.tar.xz
 #    - http://download.osmc.tv/installers/noobs/partitions-pi1.json
 #    - http://download.osmc.tv/installers/noobs/boot-rbp1.tar.xz
 #    - http://download.osmc.tv/installers/noobs/root-rbp1.tar.xz
+
 #- name: download marketing slides
 #  unarchive:
 #    src: "http://downloads.raspberrypi.org/raspbian_lite/marketing.tar"

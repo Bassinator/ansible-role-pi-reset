@@ -1,6 +1,6 @@
 galaxy_info:
   role_name: pi-reset
-  author: Bastian Bukatz
+  author: Bassinator
   description: A role to create a SD card with operating system and factory reset capability for a raspberry pi
 
   license: GNU GPLv3

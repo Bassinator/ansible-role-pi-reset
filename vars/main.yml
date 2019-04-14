@@ -2,4 +2,3 @@
 packages:
  - unzip
  - net-tools
- - iftop

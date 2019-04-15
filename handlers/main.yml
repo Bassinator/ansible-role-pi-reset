@@ -1,0 +1,13 @@
+---
+- name: extract noobs
+  unarchive:
+    src: '{{ download_dir }}/noobs_lite.zip'
+    dest: '{{ download_dir }}/noobs/'
+    remote_src: true
+
+- name: extract os
+  unarchive:
+    src: '{{ download_dir }}/raspbian_lite.zip'
+    dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
+    remote_src: true
+  when: dl_raspbian.changed

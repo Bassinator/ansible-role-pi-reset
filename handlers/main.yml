@@ -10,4 +10,3 @@
     src: '{{ download_dir }}/raspbian_lite.zip'
     dest: '{{ download_dir }}/noobs/os/raspbian_lite/'
     remote_src: true
-  when: dl_raspbian.changed

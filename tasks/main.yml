@@ -54,17 +54,16 @@
 #     dest: "/vagrant/download/os/raspbian_lite/"
 #     remote_src: true
 
-#
-# - name: configure recovery.cmd to autostart installation
-#   copy:
-#     src: recovery.cmdline
-#     dest: "/mnt/NOOBS"
-#
-# - name: enable ssh on boot
-#   file:
-#     path: "{{ download_dir }}/SSH"
-#     state: touch
-#
+- name: configure recovery.cmd to autostart installation
+  copy:
+    src: recovery.cmdline
+    dest: "/mnt/NOOBS"
+
+- name: enable ssh on boot
+  file:
+    path: "{{ download_dir }}/SSH"
+    state: touch
+
 # - name: unmount sd card
 #   mount:
 #    path: /mnt/NOOBS

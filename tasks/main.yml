@@ -48,9 +48,8 @@
     dest: "/mnt/NOOBS"
 
 - name: enable ssh on boot
-  file:
-    path: "{{ download_dir }}/noobs/SSH"
-    state: touch
+  command: "touch {{ download_dir }}/noobs/SSH"
+  args:
     creates: "{{ download_dir }}/noobs/SSH"
 
 # - name: copy wifi configuration

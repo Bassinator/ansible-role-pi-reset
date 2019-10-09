@@ -50,7 +50,7 @@
 - name: enable ssh on boot
   file:
     path: "{{ download_dir }}/SSH"
-    state: present 
+    state: present
 
 # - name: copy wifi configuration
 #   copy:

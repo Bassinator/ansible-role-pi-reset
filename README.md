@@ -14,7 +14,6 @@ None.
 Available variables are listed below, along with default values:
 
     download_dir: '/vagrant/downloads'
-    os_download_link: 'http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2018-04-19/2018-04-18-raspbian-stretch-lite.zip'
 
 
 

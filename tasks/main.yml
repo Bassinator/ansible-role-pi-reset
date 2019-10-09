@@ -50,7 +50,8 @@
 - name: enable ssh on boot
   file:
     path: "{{ download_dir }}/noobs/SSH"
-    state: file
+    state: touch
+    creates: "{{ download_dir }}/noobs/SSH" 
 
 # - name: copy wifi configuration
 #   copy:

@@ -51,7 +51,7 @@
   file:
     path: "{{ download_dir }}/noobs/SSH"
     state: touch
-    creates: "{{ download_dir }}/noobs/SSH" 
+    creates: "{{ download_dir }}/noobs/SSH"
 
 # - name: copy wifi configuration
 #   copy:

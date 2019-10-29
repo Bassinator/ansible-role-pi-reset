@@ -2,3 +2,4 @@
 packages:
  - unzip
  - net-tools
+ - lzma

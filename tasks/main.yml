@@ -1,9 +1,23 @@
 ---
-- name: install os packages
-  yum:
-    name: "{{ packages }}"
-    state: installed
-  become: true
+
+- include_tasks: redhat.yml
+  when: ansible_os_family == "RedHat"
+
+
+- include_tasks: debian.yml
+  when: ansible_os_family == "Debian"
+
+# - name: upgrade pip
+#   pip:
+#     name:
+#       - pip
+#     extra_args: --upgrade
+
+- name: install lzma modlue to support archive module with xz format
+  pip:
+    name:
+      - pylzma
+      - backports.lzma
 
 - name: create download directory
   file:
@@ -39,8 +53,37 @@
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/os.json
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partition_setup.sh
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partitions.json
-    - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/root.tar.xz
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/boot.tar.xz
+
+
+- name: create root folder to extract raspbian root partition
+  file:
+    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
+    state: directory
+    mode: '0755'
+
+- name: unarchive raspbian root partition
+  unarchive:
+    src: http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/root.tar.xz
+    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
+    remote_src: true
+
+- name: copy firstboot service to raspbian root tarball
+  copy:
+    src: firstboot.service
+    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/lib/systemd/system/firstboot.service'
+
+- name: create symlink on root partition to enable firstboot service
+  file:
+    src: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/lib/systemd/system/firstboot.service'
+    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/etc/systemd/system/multi-user.target.wants/firstboot.service'
+    state: link
+
+- name: repack the raspbian root partition for installation
+  archive:
+    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/'
+    dest: '{{ download_dir }}//noobs/os/raspbian_{{ raspbian_flavor }}/root.tar.xz'
+    format: xz
 
 - name: configure recovery.cmd to autostart installation
   copy:

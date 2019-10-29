@@ -81,7 +81,7 @@
 
 - name: repack the raspbian root partition for installation
   archive:
-    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/'
+    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
     dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/root.tar.xz'
     format: xz
 

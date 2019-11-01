@@ -7,31 +7,24 @@
 - include_tasks: debian.yml
   when: ansible_os_family == "Debian"
 
-# - name: upgrade pip
-#   pip:
-#     name:
-#       - pip
-#     extra_args: --upgrade
-
-- name: install lzma modlue to support archive module with xz format
-  pip:
-    name:
-      - pylzma
-      - backports.lzma
 
 - name: create download directory
   file:
     path: "{{ download_dir }}/noobs"
     state: directory
-    owner: '{{ installation_os_user }}'
-    group: '{{ installation_os_group }}'
-    mode: 0755
 
 - name: download noobs
   get_url:
     url: https://downloads.raspberrypi.org/NOOBS_lite_latest
     dest: '{{ download_dir }}/noobs_lite.zip'
-  notify: extract noobs
+  register: noobs_download
+
+- name: extract noobs
+  unarchive:
+    src: '{{ download_dir }}/noobs_lite.zip'
+    dest: '{{ download_dir }}/noobs/'
+    remote_src: true
+  when: noobs_download.changed
 
 - name: created raspbian directory
   file:
@@ -39,56 +32,67 @@
     state: directory
     mode: 0755
 
-- name: download os
-  get_url:
-    url: 'https://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}_latest'
-    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}.zip'
-  notify: extract os
-
 - name: download additional files
   get_url:
     url: "{{ item }}"
     dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
   with_items:
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/os.json
-    - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partition_setup.sh
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partitions.json
     - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/boot.tar.xz
+    - http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/root.tar.xz
 
+- name: Find posibly previously downloaded partition_setup.sh script not older than one day
+  find:
+    paths: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
+    patterns: 'partition_setup.sh.*'
+    age: -1d
+  register: partition_setup_backup
 
-- name: create root folder to extract raspbian root partition
-  file:
-    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
-    state: directory
-    mode: '0755'
+- name: download partition setup script
+  get_url:
+    url: http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partition_setup.sh
+    dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
+  when: not partition_setup_backup.matched
 
-- name: unarchive raspbian root partition
-  unarchive:
-    src: http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/root.tar.xz
-    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
-    remote_src: true
-
-- name: copy firstboot service to raspbian root tarball
+- name: copy firstboot.service to noobs
   copy:
     src: firstboot.service
-    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/lib/systemd/system/firstboot.service'
+    dest: "{{ download_dir }}/noobs/"
 
-- name: create symlink on root partition to enable firstboot service
-  file:
-    src: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/lib/systemd/system/firstboot.service'
-    dest: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root/etc/systemd/system/multi-user.target.wants/firstboot.service'
-    state: link
+- name: enable installation of firstboot service
+  blockinfile:
+    path: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/partition_setup.sh'
+    insertafter: "^if.*restore.*then$"
+    backup: true
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for firstboot service installation"
+    block: |2
+      if [ -f /mnt/firstboot.service ]; then
+        cp /mnt/ssh /tmp/2/root/lib/systemd/system/firstboot.service
+        ln -s /tmp/2/root/lib/systemd/system/firstboot.service /tmp/2/root/etc/systemd/system/multi-user.target.wants/firstboot.service
+      fi
 
-- name: repack the raspbian root partition for installation
-  archive:
-    path: '{{ download_dir }}/raspbian_{{ raspbian_flavor }}/root'
-    dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/root.tar.xz'
-    format: xz
+- name: copy firstboot.sh script to noobs
+  copy:
+    src: firstboot.sh
+    dest: "{{ download_dir }}/noobs/"
 
-- name: configure recovery.cmd to autostart installation
+
+- name: add functionality to install firstboot.sh script
+  blockinfile:
+    path: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/partition_setup.sh'
+    insertafter: "^if.*restore.*then$"
+    backup: true
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for firstboot command installation"
+    block: |2
+      if [ -f /mnt/firstboot.sh ]; then
+        cp /mnt/ssh /tmp/1/firstboot.sh
+      fi
+
+- name: copy modified recovery.cmdline to autostart installation
   copy:
     src: recovery.cmdline
-    dest: "/mnt/NOOBS"
+    dest: "{{ download_dir }}/noobs/recovery.cmdline"
 
 - name: enable ssh on boot
   command: "touch {{ download_dir }}/noobs/SSH"

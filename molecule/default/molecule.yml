@@ -8,12 +8,17 @@ lint:
 platforms:
   - name: centos7
     image: centos:7
-  - name: debian9
-    image: debian:stretch
+#   - name: debian9
+#     image: debian:stretch
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
+    options:
+      x:
+        - 303  # ignore check to usen archive instead of tar
+        - 306  # ignore pipefail for pipes. Testing
+        - 503  # task when changed allowed no hanler needed
 scenario:
   name: default
 verifier:

@@ -1,16 +1,8 @@
 ---
 
-- name: update all os packages
-  apt:
-    upgrade: dist
-
 - name: install os packages
   apt:
     name:
       - unzip
-      - net-tools
-      - python-setuptools
-      - python-pip
-      - liblzma-dev
     state: present
   become: true

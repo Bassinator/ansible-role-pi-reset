@@ -27,7 +27,7 @@ None.
 
     - hosts: localhost
       roles:
-         - { role: bassinator.pi-reset }
+         - { role: bassinator.pi-reset, raspbian_flavor: full }
 
 ## License
 

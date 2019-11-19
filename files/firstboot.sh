@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "firstboot"
+touch /firstboot_was_here

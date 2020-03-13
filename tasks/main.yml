@@ -78,6 +78,7 @@
     - firstboot.sh
     - wpa_supplicant.conf
     - factory_reset.sh
+    - config.txt
 
 - name: enable installation of firstboot service
   blockinfile:
@@ -86,24 +87,15 @@
     backup: true
     marker: "# {mark} ANSIBLE MANAGED BLOCK for firstboot service installation"
     block: |2
-      if [ -f /mnt/firstboot.service ]; then
-        cp /mnt/firstboot.service /tmp/2/lib/systemd/system/firstboot.service
-        ln -s /lib/systemd/system/firstboot.service /tmp/2/etc/systemd/system/multi-user.target.wants/firstboot.service
-      fi
-      if [ -f /mnt/firstboot.sh ]; then
-        cp /mnt/firstboot.sh /tmp/1/firstboot.sh
-        chmod 0755 /tmp/1/firstboot.sh
-      fi
-      if [ -f /mnt/factory_reset.sh ]; then
-        cp /mnt/factory_reset.sh /tmp/2/sbin/factory_reset.sh
-        chmod 0755 /tmp/2/sbin/factory_reset.sh
-      fi
-
-# - name: copy wifi configuration
-#   copy:
-#     src: ./wpa_supplicant.conf
-#     dest: /mnt/NOOBS/
-#     mode: 0600
+      # copy firstboot service config
+      cp /mnt/firstboot.service /tmp/2/lib/systemd/system/firstboot.service
+      ln -s /lib/systemd/system/firstboot.service /tmp/2/etc/systemd/system/multi-user.target.wants/firstboot.service
+      # copy firstboot setup script
+      cp /mnt/firstboot.sh /tmp/1/firstboot.sh
+      chmod 0755 /tmp/1/firstboot.sh
+      # copy factory_reset script
+      cp /mnt/factory_reset.sh /tmp/2/sbin/factory_reset.sh
+      chmod 0755 /tmp/2/sbin/factory_reset.sh
 
 - name: Create the noobs.zip archive
   archive:

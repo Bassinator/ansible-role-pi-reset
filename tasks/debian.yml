@@ -1,0 +1,8 @@
+---
+
+- name: install os packages
+  apt:
+    name:
+      - unzip
+    state: present
+  become: true

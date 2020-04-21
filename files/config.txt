@@ -1,0 +1,5 @@
+# Always force HDMI output and enable HDMI sound
+hdmi_safe=1
+config_hdmi_boost=4
+hdmi_force_hotplug=1
+hdmi_drive=2

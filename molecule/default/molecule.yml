@@ -3,13 +3,13 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint: |
-  set -e
-  yamllint .
-  ansible-lint -x 503
+lint:
+  name: yamllint
 platforms:
-  - name: debian10
-    image: debian:buster
+  - name: centos7
+    image: centos:7
+#   - name: debian9
+#     image: debian:stretch
 provisioner:
   name: ansible
   lint:
@@ -23,3 +23,5 @@ scenario:
   name: default
 verifier:
   name: testinfra
+  lint:
+    name: flake8

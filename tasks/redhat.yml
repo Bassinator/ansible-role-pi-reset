@@ -1,0 +1,8 @@
+---
+
+- name: install os packages
+  yum:
+    name:
+      - unzip
+    state: present
+  become: true

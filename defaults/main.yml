@@ -1,6 +1,7 @@
 ---
 download_dir: '/downloads'
 raspbian_flavor: 'full'
+# raspbian_flavor: 'lite'
 raspbian_version: ""  # empty string means latest version
 # raspbian_version: "archive/2018-11-15-21:03"
 raspbian_download_location: "http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/{{ raspbian_version }}"

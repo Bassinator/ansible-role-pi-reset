@@ -35,4 +35,3 @@ GNU GPLv3
 
 ## Author Information
 This role was created in 2018 by [Bastian Bukatz](https://bassinator.github.io).
-# ansible-role-net-sync

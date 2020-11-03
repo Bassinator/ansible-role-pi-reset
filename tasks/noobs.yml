@@ -2,7 +2,7 @@
 
 - name: download noobs
   get_url:
-    url: https://downloads.raspberrypi.org/NOOBS_lite_latest
+    url: 'https://downloads.raspberrypi.org/NOOBS_lite_latest'
     dest: '/tmp/noobs_lite.zip'
   register: noobs_download
 

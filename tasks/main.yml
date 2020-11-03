@@ -46,8 +46,8 @@
 
 - name: Ensure os download dir exists
   file:
-    path: {{ download_dir }}/noobs/os/{{ os }}/
-    state: directory
+    path: '{{ download_dir }}/noobs/os/{{ os }}/'
+    state: 'directory'
 
 - name: Find possibly previously downloaded partition_setup.sh script not older than one day. Indicates downloads already in place
   find:

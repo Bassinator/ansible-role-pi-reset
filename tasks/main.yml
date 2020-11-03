@@ -48,7 +48,7 @@
   file:
     path={{ download_dir }}/noobs/os/{{ os }}/
     state=directory
-    mode= 0755
+    mode=0755
 
 - name: Find possibly previously downloaded partition_setup.sh script not older than one day. Indicates downloads already in place
   find:
@@ -79,7 +79,7 @@
   copy:
     src: "{{ item }}"
     dest: "{{ download_dir }}"
-    mode: 644
+    mode:0644
   with_items:
     - firstboot.service
     - firstboot.sh

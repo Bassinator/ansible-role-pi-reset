@@ -6,11 +6,11 @@ env:
   global:
     - ROLE_NAME: pi_reset
   matrix:
-    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: debian10
 
 install:
   # Install test dependencies.
-  - pip install molecule ansible-lint testinfra docker
+  - pip install molecule ansible-lint testinfra docker molecule-docker
 
 before_script:
   # Use actual Ansible Galaxy role name for the project directory.

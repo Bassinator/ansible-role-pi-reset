@@ -11,4 +11,5 @@
     src: '/tmp/noobs_lite.zip'
     dest: '/mnt/recovery/'
     remote_src: true
+    mode: 0644
   when: noobs_download.changed

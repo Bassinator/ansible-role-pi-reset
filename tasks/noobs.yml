@@ -1,0 +1,14 @@
+---
+
+- name: download noobs
+  get_url:
+    url: https://downloads.raspberrypi.org/NOOBS_lite_latest
+    dest: '/tmp/noobs_lite.zip'
+  register: noobs_download
+
+- name: extract noobs
+  unarchive:
+    src: '/tmp/noobs_lite.zip'
+    dest: '/mnt/recovery/'
+    remote_src: true
+  when: noobs_download.changed

@@ -2,5 +2,5 @@
 
 molecule test --destroy never
 rm -rf noobs
-docker cp centos7:/downloads/noobs noobs
+docker cp centos7:/downloads/noobs pi-reset
 molecule destroy

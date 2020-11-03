@@ -1,32 +1,30 @@
 ---
 
-- include_tasks: redhat.yml
-  when: ansible_os_family == "RedHat"
+- name: install unzip
+  apt:
+    name:
+      - unzip
+    state: present
+  become: true
 
-- include_tasks: debian.yml
-  when: ansible_os_family == "Debian"
-
-- name: create download directory
+- name: created recovery mount point
   file:
-    path: "{{ download_dir }}/noobs"
+    path: '/mnt/recovery'
+    mode: 0755
     state: directory
 
-- name: download noobs
-  get_url:
-    url: https://downloads.raspberrypi.org/NOOBS_lite_latest
-    dest: '{{ download_dir }}/noobs_lite.zip'
-  register: noobs_download
+- name: Mount recovery partition
+  mount:
+    path: /mnt/recovery
+    src: /dev/mmcblk0p1
+    fstype: ext4
+    state: present
 
-- name: extract noobs
-  unarchive:
-    src: '{{ download_dir }}/noobs_lite.zip'
-    dest: '{{ download_dir }}/noobs/'
-    remote_src: true
-  when: noobs_download.changed
+- include_tasks: noobs.yml
 
 - name: add silentinstall to end of recovery.cmdline to enable automatic installation if not already in place
   lineinfile:
-    path: "{{ download_dir }}/noobs/recovery.cmdline"
+    path: "/mnt/recovery/recovery.cmdline"
     # regexp: '^(runinstaller(.*)$)'
     regexp: '^((?!.*(silentinstall))runinstaller(.*)$)'
     line: '\1 silentinstall'
@@ -34,19 +32,25 @@
     state: present
 
 - name: enable ssh on boot
-  command: "touch {{ download_dir }}/noobs/SSH"
+  command: "touch /mnt/recovery/SSH"
   args:
-    creates: "{{ download_dir }}/noobs/SSH"
+    creates: "/mnt/recovery/SSH"
 
-- name: created raspbian directory
+- name: copy wifi network config
+  copy:
+    src: "/etc/wpa_supplicant.conf"
+    remote_src: true
+    dest: "/mnt/recovery/noobs/"
+  when: preserve_wifi_config
+
+- name: Ensure os download dir exists
   file:
-    path: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
-    state: directory
-    mode: 0755
+    path={{ download_dir }}/noobs/os/{{ os }}/
+    state=directory
 
 - name: Find possibly previously downloaded partition_setup.sh script not older than one day. Indicates downloads already in place
   find:
-    paths: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
+    paths: '{{ download_dir }}/noobs/os/{{ os }}/'
     patterns: 'partition_setup.sh.*'
     age: -1d
   register: partition_setup_backup
@@ -54,7 +58,7 @@
 - name: download additional files
   get_url:
     url: "{{ raspbian_download_location }}/{{ item }}"
-    dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
+    dest: '{{ download_dir }}/noobs/os/{{ os }}/'
   with_items:
     - partition_setup.sh
     - os.json
@@ -65,14 +69,14 @@
 
 - name: download partition setup script
   get_url:
-    url: http://downloads.raspberrypi.org/raspbian_{{ raspbian_flavor }}/partition_setup.sh
-    dest: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/'
+    url: http://downloads.raspberrypi.org/{{ os }}/partition_setup.sh
+    dest: '{{ download_dir }}/noobs/os/{{ os }}/'
   when: not partition_setup_backup.matched
 
 - name: copy firstboot files to noobs
   copy:
     src: "{{ item }}"
-    dest: "{{ download_dir }}/noobs/"
+    dest: "{{ download_dir }}"
   with_items:
     - firstboot.service
     - firstboot.sh
@@ -82,7 +86,7 @@
 
 - name: enable installation of firstboot service
   blockinfile:
-    path: '{{ download_dir }}/noobs/os/raspbian_{{ raspbian_flavor }}/partition_setup.sh'
+    path: '{{ download_dir }}/noobs/os/{{ os }}/partition_setup.sh'
     insertafter: "^if.*restore.*then$"
     backup: true
     marker: "# {mark} ANSIBLE MANAGED BLOCK for firstboot service installation"
@@ -96,9 +100,3 @@
       # copy factory_reset script
       cp /mnt/factory_reset.sh /tmp/2/sbin/factory_reset.sh
       chmod 0755 /tmp/2/sbin/factory_reset.sh
-
-- name: Create the noobs.zip archive
-  archive:
-    path: "{{ download_dir }}/noobs"
-    dest: "/noobs.zip"
-    format: zip

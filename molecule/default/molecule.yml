@@ -8,10 +8,8 @@ lint: |
   yamllint .
   ansible-lint -x 503
 platforms:
-  - name: centos7
-    image: centos:7
-#   - name: debian9
-#     image: debian:stretch
+  - name: debian10
+    image: debian:buster
 provisioner:
   name: ansible
   lint:
